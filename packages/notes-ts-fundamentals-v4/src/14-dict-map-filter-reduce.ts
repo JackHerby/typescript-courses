@@ -10,9 +10,7 @@ console.clear()
 
 function assertEquals<T>(found: T, expected: T, message: string) {
   if (found !== expected)
-    throw new Error(
-      `❌ Assertion failed: ${message}\nexpected: ${expected}\nfound: ${found}`,
-    )
+    throw new Error(`❌ Assertion failed: ${message}\nexpected: ${expected}\nfound: ${found}`)
   console.log(`✅ OK ${message}`)
 }
 
@@ -39,11 +37,36 @@ interface Dict<T> {
 }
 
 // Array.prototype.map, but for Dict
-function mapDict(...args: any[]): any {}
+function mapDict<T, U>(inputDict: Dict<T>, callback: (value: T, key: string) => U): Dict<U> {
+  const result: Dict<U> = {} 
+  for (const key in inputDict) {
+    result[key] = callback(inputDict[key], key)
+  }
+  return result
+}
 // Array.prototype.filter, but for Dict
-function filterDict(...args: any[]): any {}
+function filterDict<T>(inputDict: Dict<T>, callback: (value: T, key: string) => boolean): Dict<T> {
+  const result: Dict<T> = {}
+  for (const key in inputDict) {
+    const thisValue = inputDict[key]
+    if (callback(inputDict[key], key)) {
+      result[key] = thisValue
+    }
+  }
+  return result
+}
 // Array.prototype.reduce, but for Dict
-function reduceDict(...args: any[]): any {}
+function reduceDict<T, U>(
+  inputDict: Dict<T>,
+  callback: (currentValue: U, item: T) => U,
+  initialValue: U,
+): U {
+  let accumulator = initialValue
+  for (const key in inputDict) {
+    accumulator = callback(accumulator, inputDict[key])
+  }
+  return accumulator
+}
 
 /////////////////////////////////////////
 ///////////// TEST SUITE ///////////////
@@ -70,26 +93,14 @@ assertEquals(
   0.005,
   '[MAP] .cherry has a "kg" property with value 0.005',
 )
-assertEquals(
-  fruitsWithKgMass.cherry.mass,
-  5,
-  '[MAP] .cherry has a "mass" property with value 5',
-)
-assertEquals(
-  Object.keys(fruitsWithKgMass).length,
-  8,
-  '[MAP] fruitsWithKgMass should have 8 keys',
-)
+assertEquals(fruitsWithKgMass.cherry.mass, 5, '[MAP] .cherry has a "mass" property with value 5')
+assertEquals(Object.keys(fruitsWithKgMass).length, 8, '[MAP] fruitsWithKgMass should have 8 keys')
 
 // FILTER
 // only red fruits
 const redFruits = filterDict(fruits, (fruit) => fruit.color === 'red')
 assertOk(redFruits, '[FILTER] filterDict returns something truthy')
-assertEquals(
-  Object.keys(redFruits).length,
-  4,
-  '[FILTER] 4 fruits that satisfy the filter',
-)
+assertEquals(Object.keys(redFruits).length, 4, '[FILTER] 4 fruits that satisfy the filter')
 assertEquals(
   Object.keys(redFruits).sort().join(', '),
   'apple, cherry, grape, raspberry',
@@ -98,22 +109,10 @@ assertEquals(
 
 // REDUCE
 // If we had one of each fruit, how much would the total mass be?
-const oneOfEachFruitMass = reduceDict(
-  fruits,
-  (currentMass, fruit) => currentMass + fruit.mass,
-  0,
-)
+const oneOfEachFruitMass = reduceDict(fruits, (currentMass, fruit) => currentMass + fruit.mass, 0)
 assertOk(redFruits, '[REDUCE] reduceDict returns something truthy')
-assertEquals(
-  typeof oneOfEachFruitMass,
-  'number',
-  '[REDUCE] reduceDict returns a number',
-)
-assertEquals(
-  oneOfEachFruitMass,
-  817,
-  '[REDUCE] 817g mass if we had one of each fruit',
-)
+assertEquals(typeof oneOfEachFruitMass, 'number', '[REDUCE] reduceDict returns a number')
+assertEquals(oneOfEachFruitMass, 817, '[REDUCE] 817g mass if we had one of each fruit')
 
 /**/
 export default {}
