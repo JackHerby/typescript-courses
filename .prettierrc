@@ -7,5 +7,5 @@
   "trailingComma": "all",
   "quoteProps": "consistent",
   "arrowParens": "always",
-  "printWidth": 70
+  "printWidth": 100
 }
