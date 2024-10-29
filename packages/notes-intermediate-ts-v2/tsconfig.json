@@ -13,6 +13,7 @@
         "strictNullChecks": true,
         "checkJs": true,
         "esModuleInterop": false,
-        "allowSyntheticDefaultImports": false
+        "allowSyntheticDefaultImports": false,
+        "strictPropertyInitialization": true
     }
 }
