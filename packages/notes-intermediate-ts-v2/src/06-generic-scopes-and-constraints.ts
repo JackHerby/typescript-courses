@@ -34,54 +34,70 @@ function listToDict<T>(
 
   return dict // result
 }
-/*
-// interface HasId {
-//   id: string
-// }
-// interface Dict<T> {
-//   [k: string]: T
-// }
 
-// function listToDict(list: HasId[]): Dict<HasId> {
-//   const dict: Dict<HasId> = {}
+interface HasId {
+  id: string
+}
+interface Dict<T> {
+  [k: string]: T
+}
 
-//   list.forEach((item) => {
-//     dict[item.id] = item
-//   })
+// function listToDict2(list: HasId[]): Dict<HasId> {
+// function listToDict2<T>(list: T[]): Dict<T> {
+function listToDict2<T extends HasId>(list: T[]): Dict<T> {
+  // const dict: Dict<HasId> = {}
+  const dict: Dict<T> = {}
 
-//   return dict
-// }
+  list.forEach((item) => {
+    dict[item.id] = item
+  })
 
-/*
+  return dict
+}
+
+// satisfies keyword also specifies values on the object
+interface ValueWithId extends HasId {
+  value?: 1 | 2 | 3 | 4 | 5
+}
+const myVal = { id: 'a', value: 1 } satisfies ValueWithId
+myVal.value.toFixed(2)
+
+const testArr = [
+  { id: 'a', value: 1 },
+  { id: 'b', value: 2 },
+  { id: 'c', value: 3 },
+]
+const testResult = listToDict2(testArr)
+// only `id` can be accessed here
+// testResult.a
+
 //? Let's make it
 // function listToDict<T>(list: T[]): Dict<T> {
 
 //* Describing the constraint
-/*
 // function listToDict<T extends HasId>(list: T[]): Dict<T> {
 
 //* Scopes and Type Parameters
-/*
-// function eatApple(bowl: any, eater: (arg: any) => void) {}
+function eatApple(bowl: any, eater: (arg: any) => void) {}
 
-// function receiveFruitBasket(bowl: any) {
-//   console.log('Thanks for the fruit basket!')
-//   // only `bowl` can be accessed here
-//   eatApple(bowl, (apple: any) => {
-//     // both `bowl` and `apple` can be accessed here
-//   })
-// }
+function receiveFruitBasket(bowl: any) {
+  console.log('Thanks for the fruit basket!')
+  // only `bowl` can be accessed here
+  eatApple(bowl, (apple: any) => {
+    // both `bowl` and `apple` can be accessed here
+  })
+}
 
-// // outer function
-// function tupleCreator<T>(first: T) {
-//   // inner function
-//   return function finish<S>(last: S): [T, S] {
-//     return [first, last]
-//   }
-// }
-// const finishTuple = tupleCreator(3 as const)
-// const t1 = finishTuple(null)
-// const t2 = finishTuple([4, 8, 15, 16, 23, 42])
+// outer function
+function tupleCreator<T>(first: T) {
+  // inner function
+  return function finish<S>(last: S): [T, S] {
+    return [first, last]
+  }
+}
+const finishTuple = tupleCreator(3 as const)
+const t1 = finishTuple(null)
+const t2 = finishTuple([4, 8, 15, 16, 23, 42])
 
 //* Best practices
 // interface HasId {
@@ -91,37 +107,35 @@ function listToDict<T>(
 //   [k: string]: T
 // }
 
-// function example1<T extends HasId[]>(list: T) {
-//   return list.pop()
-//   //      ^?
-// }
-// function example2<T extends HasId>(list: T[]) {
-//   return list.pop()
-//   //      ^?
-// }
+function example1<T extends HasId[]>(list: T) {
+  return list.pop()
+  //      ^?
+}
+function example2<T extends HasId>(list: T[]) {
+  return list.pop()
+  //      ^?
+}
 
-// class Payment implements HasId {
-//   static #next_id_counter = 1;
-//   id = `pmnt_${Payment.#next_id_counter++}`
-// }
-// class Invoice implements HasId {
-//   static #next_id_counter = 1;
-//   id = `invc_${Invoice.#next_id_counter++}`
-// }
+class Payment implements HasId {
+  static #next_id_counter = 1;
+  id = `pmnt_${Payment.#next_id_counter++}`
+}
+class Invoice implements HasId {
+  static #next_id_counter = 1;
+  id = `invc_${Invoice.#next_id_counter++}`
+}
 
-// const result1 = example1([
-//   //   ^?
-//   new Payment(),
-//   new Invoice(),
-//   new Payment()
-// ])
+const result1 = example1([
+  //   ^?
+  new Payment(),
+  new Invoice(),
+  new Payment()
+])
 
-// const result2 = example2([
-//   //   ^?
-//   new Payment(),
-//   new Invoice(),
-//   new Payment()
-// ])
-
-/**/
+const result2 = example2([
+  //   ^?
+  new Payment(),
+  new Invoice(),
+  new Payment()
+])
 export default {}

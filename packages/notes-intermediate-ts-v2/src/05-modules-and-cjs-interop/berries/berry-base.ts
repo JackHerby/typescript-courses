@@ -1,3 +1,3 @@
 export abstract class BerryBase {
-    abstract color: string
+  abstract color: string
 }
